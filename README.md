@@ -1,12 +1,12 @@
 # ISL – Iterated Search in Julia
 
-Este projeto implementa um algoritmo **ISL (Iterated Search / Iterated Local Search)** utilizando a linguagem **Julia**, com foco em problemas de otimização combinatória.
+Este projeto implementa um algoritmo **ISL (Iterated Search / Iterated Local Search)** utilizando a linguagem **Julia**, com foco no TSP.
 
 ---
 
 ## 🎯 Objetivo acadêmico
 
-Este projeto foi desenvolvido na linguagem **Julia** para a disciplina **Otimização Combinatória**, com o objetivo de fornecer uma estrutura modular e extensível, permitindo a fácil adaptação do algoritmo para diferentes problemas, funções objetivo e estruturas de vizinhança.
+Este projeto foi desenvolvido na linguagem **Julia** para a disciplina **Otimização Combinatória**, com o objetivo de fornecer uma estrutura modular e extensível, permitindo a fácil adaptação do algoritmo para o problema TSP.
 
 ---
 
