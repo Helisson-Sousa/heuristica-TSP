@@ -1,9 +1,7 @@
-# ---------------------------------------------------------
+# =========================================================
 # Data.jl
 # Wrapper leve sobre tspreader.jl
-# ---------------------------------------------------------
-
-include(joinpath(@__DIR__, "tspreader.jl"))
+# =========================================================
 
 mutable struct TSPData
     dimension::Int
@@ -14,11 +12,11 @@ end
 """
     TSPData(instancePath::String)
 
-Cria a estrutura de dados do TSP a partir de um arquivo TSPLIB.
+Cria a estrutura de dados do TSP a partir de um arquivo TSPLIB
+usando tspreader.jl
 """
 function TSPData(instancePath::String)
 
-    # reaproveita exatamente o que você já implementou
     data = Data(2, instancePath)
     read!(data)
 

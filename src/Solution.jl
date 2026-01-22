@@ -2,14 +2,14 @@
 
 mutable struct Solution
     sequencia::Vector{Int}
-    valorObj::Float64
+    cost::Float64
 end
 
 # ---------------------------------------------------
 # Construtor padrão (solução vazia)
 # ---------------------------------------------------
 function Solution()
-    return Solution(Int[], 0.0)
+    return Solution(Int[], Inf)
 end
 
 # ---------------------------------------------------

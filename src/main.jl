@@ -1,20 +1,26 @@
-# =================== main.jl ===================
+# =========================================================
+# main.jl
+# Execução do ILS para o TSP
+# =========================================================
 
-# ---- Includes dos módulos ----
-include(joinpath(@__DIR__, "Data.jl"))
+# -----------------------------
+# Includes dos módulos
+# -----------------------------
 include(joinpath(@__DIR__, "Solution.jl"))
 include(joinpath(@__DIR__, "Construction.jl"))
 include(joinpath(@__DIR__, "LocalSearch.jl"))
 include(joinpath(@__DIR__, "Perturbation.jl"))
 include(joinpath(@__DIR__, "ILS.jl"))
+include(joinpath(@__DIR__, "Data.jl"))
 
-# Leitor TSPLIB
+# Leitor TSPLIB (apenas aqui!)
 include("../tspreader.jl")
 
 using Printf
 using Random
 
 function main()
+
     if length(ARGS) < 1
         println("Uso: julia main.jl <caminho_para_instancia.tsp>")
         return
@@ -24,12 +30,9 @@ function main()
     # Leitura da instância
     # -----------------------------
     instancia_path = ARGS[1]
-    instance_name = splitext(basename(instancia_path))[1]
+    data = TSPData(instancia_path)
 
-    data = Data(2, instancia_path)
-    read!(data)
-
-    @printf("Instância: %s\n", instance_name)
+    @printf("Instância: %s\n", data.instanceName)
     @printf("Dimensão: %d\n", data.dimension)
 
     # -----------------------------
@@ -38,7 +41,6 @@ function main()
     maxIter = 50
     maxIterILS = data.dimension >= 150 ? div(data.dimension, 2) : data.dimension
 
-    # Seed opcional (reprodutibilidade)
     Random.seed!(time_ns())
 
     # -----------------------------
@@ -52,11 +54,11 @@ function main()
     # Resultados
     # -----------------------------
     @printf("\nTempo de execução: %.4f segundos\n", elapsed)
-    @printf("Custo da melhor solução: %.2f\n", bestSol.cost)
-    @printf("Sequência final (%d cidades)\n", length(bestSol.sequence) - 1)
+    @printf("Custo da melhor solução: %.2f\n", bestSol.valorObj)
+    @printf("Sequência final (%d cidades)\n",
+            length(bestSol.sequencia) - 1)
 
-    # Opcional: imprimir rota
-    # println(bestSol.sequence)
+    # println(bestSol.sequencia)
 end
 
 main()

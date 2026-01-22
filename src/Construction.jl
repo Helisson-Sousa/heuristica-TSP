@@ -9,70 +9,83 @@ using Random
 # Estrutura auxiliar para custo de inserção
 # ---------------------------------------------------------
 mutable struct InsertionInfo
-    noInserido::Int
-    arestaRemovida::Int
-    custo::Float64
+    node::Int
+    edgePos::Int
+    cost::Float64
 end
 
 # ---------------------------------------------------------
 # Estrutura Construction
 # ---------------------------------------------------------
 mutable struct Construction
-    dados::TSPData
-    cidades::Vector{Int}
-    custoInsercao::Vector{InsertionInfo}
+    data::Data
+    remaining::Vector{Int}
+    insertionCost::Vector{InsertionInfo}
 
-    function Construction(dados::TSPData)
-        new(dados, Int[], InsertionInfo[])
+    function Construction(data::Data)
+        new(data, Int[], InsertionInfo[])
     end
 end
 
 # ---------------------------------------------------------
-# Solução inicial
+# Solução inicial (in-place)
+# Equivalente ao Construcao::solucaoInicial(Solucao& s) em C++
 # ---------------------------------------------------------
 function solucaoInicial!(constr::Construction, s::Solution)
 
-    # Inicializa lista de cidades (2 até n)
-    constr.cidades = collect(2:constr.dados.dimension)
-    constr.custoInsercao = InsertionInfo[]
+    # Inicializa lista de cidades não visitadas (2 até n)
+    constr.remaining = collect(2:constr.data.dimension)
+    empty!(constr.insertionCost)
 
-    # Solução começa e termina em 1
-    s.sequencia = [1, 1]
-    s.valorObj = 0.0
+    # Solução começa e termina na cidade 1
+    s.sequence = [1, 1]
+    s.cost = 0.0
+
+    dist = constr.data.distMatrix
 
     # ------------------ Inserção aleatória inicial (3 cidades) ------------------
     for _ in 1:3
-        idx = rand(1:length(constr.cidades))
-        cidadeSelecionada = constr.cidades[idx]
+        idx = rand(1:length(constr.remaining))
+        city = constr.remaining[idx]
 
-        cidadeAnterior = s.sequencia[end-1]
-        ultimaCidade   = s.sequencia[end]
+        prevCity = s.sequence[end - 1]
+        nextCity = s.sequence[end]
 
-        insert!(s.sequencia, length(s.sequencia), cidadeSelecionada)
+        insert!(s.sequence, length(s.sequence), city)
 
-        s.valorObj += constr.dados.dist[cidadeAnterior, cidadeSelecionada] +
-                      constr.dados.dist[cidadeSelecionada, ultimaCidade] -
-                      constr.dados.dist[cidadeAnterior, ultimaCidade]
+        s.cost += dist[prevCity, city] +
+                  dist[city, nextCity] -
+                  dist[prevCity, nextCity]
 
-        deleteat!(constr.cidades, idx)
+        deleteat!(constr.remaining, idx)
     end
 
-    # ------------------ Inserções guiadas por custo ------------------
-    while !isempty(constr.cidades)
+    # ------------------ Inserções guiadas por custo (GRASP) ------------------
+    while !isempty(constr.remaining)
 
         calcularCustoInsercao!(constr, s)
 
-        sort!(constr.custoInsercao, by = x -> x.custo)
+        sort!(constr.insertionCost, by = x -> x.cost)
 
-        alpha = rand()
-        limite = max(1, ceil(Int, alpha * length(constr.custoInsercao)))
-        selecionado = rand(1:limite)
+        α = rand()
+        limite = max(1, ceil(Int, α * length(constr.insertionCost)))
+        escolhido = rand(1:limite)
 
-        info = constr.custoInsercao[selecionado]
+        info = constr.insertionCost[escolhido]
 
         inserirNaSolucao!(constr, s, info)
-        s.valorObj += info.custo
+        s.cost += info.cost
     end
+end
+
+# ---------------------------------------------------------
+# Wrapper: cria e retorna uma Solution
+# Necessário para o ILS
+# ---------------------------------------------------------
+function solucaoInicial(constr::Construction)
+    s = Solution()
+    solucaoInicial!(constr, s)
+    return s
 end
 
 # ---------------------------------------------------------
@@ -80,20 +93,21 @@ end
 # ---------------------------------------------------------
 function calcularCustoInsercao!(constr::Construction, s::Solution)
 
-    empty!(constr.custoInsercao)
+    empty!(constr.insertionCost)
+    dist = constr.data.distMatrix
 
-    for a in 1:(length(s.sequencia) - 1)
+    for pos in 1:(length(s.sequence) - 1)
 
-        i = s.sequencia[a]
-        j = s.sequencia[a + 1]
+        i = s.sequence[pos]
+        j = s.sequence[pos + 1]
 
-        for cid in constr.cidades
-            custo = constr.dados.dist[i, cid] +
-                    constr.dados.dist[cid, j] -
-                    constr.dados.dist[i, j]
+        for city in constr.remaining
+            cost = dist[i, city] +
+                   dist[city, j] -
+                   dist[i, j]
 
-            push!(constr.custoInsercao,
-                  InsertionInfo(cid, a, custo))
+            push!(constr.insertionCost,
+                  InsertionInfo(city, pos, cost))
         end
     end
 end
@@ -103,15 +117,12 @@ end
 # ---------------------------------------------------------
 function inserirNaSolucao!(constr::Construction, s::Solution, info::InsertionInfo)
 
-    pos = info.arestaRemovida
-    cidade = info.noInserido
+    insert!(s.sequence, info.edgePos + 1, info.node)
 
-    insert!(s.sequencia, pos + 1, cidade)
+    empty!(constr.insertionCost)
 
-    empty!(constr.custoInsercao)
-
-    idx = findfirst(==(cidade), constr.cidades)
+    idx = findfirst(==(info.node), constr.remaining)
     if idx !== nothing
-        deleteat!(constr.cidades, idx)
+        deleteat!(constr.remaining, idx)
     end
 end
