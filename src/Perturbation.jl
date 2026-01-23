@@ -96,21 +96,43 @@ function mecanismoPert!(p::Perturbation, best::Solution)::Solution
     s.cost = s.cost - custoRetirada + custoInsercao
 
     # ----------------- Troca dos blocos -----------------
+    # ----------------- Troca dos blocos -----------------
     if j > i
+        # remove primeiro o bloco mais à direita
         deleteat!(seq, j:(j + tamSegBloco - 1))
         deleteat!(seq, i:(i + tamPrimBloco - 1))
 
-        insert!(seq, i, bloco_j...)
+        # insere bloco_j em i
+        for (k, v) in enumerate(bloco_j)
+            insert!(seq, i + k - 1, v)
+        end
+
         novaPos_j = j - tamPrimBloco + tamSegBloco
-        insert!(seq, novaPos_j, bloco_i...)
+
+        # insere bloco_i na nova posição
+        for (k, v) in enumerate(bloco_i)
+            insert!(seq, novaPos_j + k - 1, v)
+        end
+
     else
+        # remove primeiro o bloco mais à direita
         deleteat!(seq, i:(i + tamPrimBloco - 1))
         deleteat!(seq, j:(j + tamSegBloco - 1))
 
-        insert!(seq, j, bloco_i...)
+        # insere bloco_i em j
+        for (k, v) in enumerate(bloco_i)
+            insert!(seq, j + k - 1, v)
+        end
+
         novaPos_i = i - tamSegBloco + tamPrimBloco
-        insert!(seq, novaPos_i, bloco_j...)
+
+        # insere bloco_j na nova posição
+        for (k, v) in enumerate(bloco_j)
+            insert!(seq, novaPos_i + k - 1, v)
+        end
     end
+
+    seq[end] = seq[1]
 
     return s
 end

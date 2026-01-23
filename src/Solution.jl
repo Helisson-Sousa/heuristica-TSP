@@ -1,7 +1,7 @@
 # =================== Solution.jl ===================
 
 mutable struct Solution
-    sequencia::Vector{Int}
+    sequence::Vector{Int}
     cost::Float64
 end
 
@@ -33,5 +33,5 @@ end
 import Base: copy
 
 function copy(s::Solution)
-    return Solution(copy(s.sequencia), s.valorObj)
+    return Solution(copy(s.sequence), s.cost)
 end

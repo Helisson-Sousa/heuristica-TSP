@@ -27,26 +27,26 @@ function bestImprovementSwap!(ls::LocalSearch, s::Solution)::Bool
 
             if j - i == 1
                 custoRetirada =
-                    ls.data.dist[vi_prev, vi] +
-                    ls.data.dist[vi, vj] +
-                    ls.data.dist[vj, vj_next]
+                    ls.data.distMatrix[vi_prev, vi] +
+                    ls.data.distMatrix[vi, vj] +
+                    ls.data.distMatrix[vj, vj_next]
 
                 custoInsercao =
-                    ls.data.dist[vi_prev, vj] +
-                    ls.data.dist[vj, vi] +
-                    ls.data.dist[vi, vj_next]
+                    ls.data.distMatrix[vi_prev, vj] +
+                    ls.data.distMatrix[vj, vi] +
+                    ls.data.distMatrix[vi, vj_next]
             else
                 custoRetirada =
-                    ls.data.dist[vi_prev, vi] +
-                    ls.data.dist[vi, vi_next] +
-                    ls.data.dist[vj_prev, vj] +
-                    ls.data.dist[vj, vj_next]
+                    ls.data.distMatrix[vi_prev, vi] +
+                    ls.data.distMatrix[vi, vi_next] +
+                    ls.data.distMatrix[vj_prev, vj] +
+                    ls.data.distMatrix[vj, vj_next]
 
                 custoInsercao =
-                    ls.data.dist[vi_prev, vj] +
-                    ls.data.dist[vj, vi_next] +
-                    ls.data.dist[vj_prev, vi] +
-                    ls.data.dist[vi, vj_next]
+                    ls.data.distMatrix[vi_prev, vj] +
+                    ls.data.distMatrix[vj, vi_next] +
+                    ls.data.distMatrix[vj_prev, vi] +
+                    ls.data.distMatrix[vi, vj_next]
             end
 
             cost = s.cost - custoRetirada + custoInsercao
@@ -93,14 +93,14 @@ function bestImprovementReInsertion!(ls::LocalSearch, s::Solution)::Bool
             vj_prev = seq[j-1]
 
             custoRetirada =
-                ls.data.dist[vi_prev, vi] +
-                ls.data.dist[vi, vi_next] +
-                ls.data.dist[vj_prev, vj]
+                ls.data.distMatrix[vi_prev, vi] +
+                ls.data.distMatrix[vi, vi_next] +
+                ls.data.distMatrix[vj_prev, vj]
 
             custoInsercao =
-                ls.data.dist[vi_prev, vi_next] +
-                ls.data.dist[vj_prev, vi] +
-                ls.data.dist[vi, vj]
+                ls.data.distMatrix[vi_prev, vi_next] +
+                ls.data.distMatrix[vj_prev, vi] +
+                ls.data.distMatrix[vi, vj]
 
             cost = s.cost - custoRetirada + custoInsercao
 
@@ -155,14 +155,14 @@ function bestImprovementOrOpt!(ls::LocalSearch, s::Solution, tamBloco::Int)::Boo
             vj_prev = seq[j-1]
 
             custoRetirada =
-                ls.data.dist[vi1_prev, vi1] +
-                ls.data.dist[vi2, vi2_next] +
-                ls.data.dist[vj_prev, vj]
+                ls.data.distMatrix[vi1_prev, vi1] +
+                ls.data.distMatrix[vi2, vi2_next] +
+                ls.data.distMatrix[vj_prev, vj]
 
             custoInsercao =
-                ls.data.dist[vi1_prev, vi2_next] +
-                ls.data.dist[vj_prev, vi1] +
-                ls.data.dist[vi2, vj]
+                ls.data.distMatrix[vi1_prev, vi2_next] +
+                ls.data.distMatrix[vj_prev, vi1] +
+                ls.data.distMatrix[vi2, vj]
 
             cost = s.cost - custoRetirada + custoInsercao
 
@@ -214,16 +214,16 @@ function bestImprovement2Opt!(ls::LocalSearch, s::Solution)::Bool
             vj_next = seq[j+1]
 
             custoRetirada =
-                ls.data.dist[vi_prev, vi] +
-                ls.data.dist[vj, vj_next]
+                ls.data.distMatrix[vi_prev, vi] +
+                ls.data.distMatrix[vj, vj_next]
 
             custoInsercao =
-                ls.data.dist[vi_prev, vj] +
-                ls.data.dist[vi, vj_next]
+                ls.data.distMatrix[vi_prev, vj] +
+                ls.data.distMatrix[vi, vj_next]
 
             for k in i:j-1
-                custoRetirada += ls.data.dist[seq[k], seq[k+1]]
-                custoInsercao += ls.data.dist[seq[k+1], seq[k]]
+                custoRetirada += ls.data.distMatrix[seq[k], seq[k+1]]
+                custoInsercao += ls.data.distMatrix[seq[k+1], seq[k]]
             end
 
             cost = s.cost - custoRetirada + custoInsercao
