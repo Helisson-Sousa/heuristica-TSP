@@ -2,44 +2,47 @@
 
 function ILS(dados::Data, maxIter::Int, maxIterILS::Int)
 
-    # Melhor solução global
-    bestOfAll = Solution(Int[], Inf)
+    println(">> ILS iniciado")
+
+    bestOfAll = Solution(Inf)
 
     constr = Construction(dados)
     busca  = LocalSearch(dados)
     pert   = Perturbation(dados)
 
-    for _ in 1:maxIter
-
-        # ---------- Construção + Busca Local ----------
+    for it in 1:maxIter
         solAtual = solucaoInicial(constr)
+
         RVND!(busca, solAtual)
 
-        # Melhor solução da iteração
-        best = Solution(copy(solAtual.sequence), solAtual.cost)
+        best = copy(solAtual)
         iterILS = 0
 
-        # ---------- Loop ILS ----------
-        while iterILS < maxIterILS
+        maxPerturb = 200
+        contPerturb = 0
 
-            # Perturba a melhor solução atual
+        while iterILS < maxIterILS && contPerturb < maxPerturb
+            contPerturb += 1
+
             solAtual = mecanismoPert!(pert, best)
+            println("        Perturbação aplicada")
+
             RVND!(busca, solAtual)
 
-            # Critério de aceitação
             if solAtual.cost < best.cost
-                best = Solution(copy(solAtual.sequence), solAtual.cost)
+                println("        Melhora encontrada")
+                best = copy(solAtual)
                 iterILS = 0
             else
                 iterILS += 1
             end
         end
 
-        # Atualiza melhor global
         if best.cost < bestOfAll.cost
-            bestOfAll = Solution(copy(best.sequence), best.cost)
+            bestOfAll = copy(best)
         end
     end
 
+    println(">> ILS terminou")
     return bestOfAll
 end

@@ -18,6 +18,8 @@ using Random
 
 function main()
 
+    println(">> Entrou no main")
+
     # -----------------------------
     # Definir caminho da instância
     # -----------------------------
@@ -44,7 +46,10 @@ function main()
     # Parâmetros do ILS
     # -----------------------------
     maxIter = 50
-    maxIterILS = data.dimension >= 150 ? div(data.dimension, 2) : data.dimension
+    maxIterILS = data.dimension <= 20 ? 20 :
+             data.dimension <= 100 ? 50 :
+             div(data.dimension, 2)
+
 
     Random.seed!(time_ns())
 
@@ -54,6 +59,8 @@ function main()
     start_time = time()
     bestSol = ILS(data, maxIter, maxIterILS)
     elapsed = time() - start_time
+
+    println(">> Saiu do ILS")
 
     # -----------------------------
     # Resultados
