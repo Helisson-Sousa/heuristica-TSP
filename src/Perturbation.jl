@@ -4,60 +4,95 @@ mutable struct Perturbation
     data::Data
 end
 
-# Double-Bridge / Block Swap Perturbation
-
 function mecanismoPert!(p::Perturbation, best::Solution)::Solution
 
     s = copy(best)
     seq = s.sequence
-    n = length(seq) - 1 
+    n = p.data.dimension
+    dist = p.data.distMatrix
 
-    maxTam = max(2, div(n, 10))
+    maxTam = div(n, 10)
+    tam1 = 2 + rand(0:maxTam-1)
+    tam2 = 2 + rand(0:maxTam-1)
 
-    tam1 = rand(2:maxTam)
-    tam2 = rand(2:maxTam)
+    i = 2 + rand(0:(n - tam1 - 2))
 
-    i = rand(2:(n - tam1 - 1))
-
-    j = rand(2:(n - tam2 - 1))
-    while (j >= i && j <= i + tam1) || (i >= j && i <= j + tam2)
-        j = rand(2:(n - tam2 - 1))
+    j = 0
+    while true
+        j = 2 + rand(0:(n - tam2 - 2))
+        if !((j >= i && j < i + tam1) || (i >= j && i < j + tam2))
+            break
+        end
     end
 
-    bloco1 = seq[i:(i + tam1 - 1)]
-    bloco2 = seq[j:(j + tam2 - 1)]
+    bloco_i = seq[i:(i + tam1 - 1)]
+    bloco_j = seq[j:(j + tam2 - 1)]
+
+    vi        = seq[i]
+    vi_prev   = seq[i - 1]
+    vi2       = seq[i + tam1 - 1]
+    vi2_next  = seq[i + tam1]
+
+    vj        = seq[j]
+    vj_prev   = seq[j - 1]
+    vj2       = seq[j + tam2 - 1]
+    vj2_next  = seq[j + tam2]
+
+    custoRetirada = 0.0
+    custoInsercao = 0.0
+
+    if j == i + tam1
+        custoRetirada =
+            dist[vi_prev, vi] +
+            dist[vi2, vj] +
+            dist[vj2, vj2_next]
+
+        custoInsercao =
+            dist[vi_prev, vj] +
+            dist[vj2, vi] +
+            dist[vi2, vj2_next]
+
+    elseif i == j + tam2
+        custoRetirada =
+            dist[vi_prev, vi] +
+            dist[vi2, vi2_next] +
+            dist[vj_prev, vj]
+
+        custoInsercao =
+            dist[vj_prev, vi] +
+            dist[vi2, vj] +
+            dist[vj2, vi2_next]
+
+    else
+        custoRetirada =
+            dist[vi_prev, vi] +
+            dist[vi2, vi2_next] +
+            dist[vj_prev, vj] +
+            dist[vj2, vj2_next]
+
+        custoInsercao =
+            dist[vi_prev, vj] +
+            dist[vj2, vi2_next] +
+            dist[vj_prev, vi] +
+            dist[vi2, vj2_next]
+    end
+
+    s.cost = s.cost - custoRetirada + custoInsercao
 
     if j > i
         deleteat!(seq, j:(j + tam2 - 1))
         deleteat!(seq, i:(i + tam1 - 1))
 
-        for v in reverse(bloco2)
-            insert!(seq, i, v)
-        end
-        
-        for v in reverse(bloco1)
-            insert!(seq, j - tam1 + tam2, v)
-        end
-        
+        insert!(seq, i:i-1, bloco_j)
+        novaPos_j = j - tam1 + tam2
+        insert!(seq, novaPos_j:novaPos_j-1, bloco_i)
     else
         deleteat!(seq, i:(i + tam1 - 1))
         deleteat!(seq, j:(j + tam2 - 1))
 
-        for v in reverse(bloco1)
-            insert!(seq, j, v)
-        end
-        
-        for v in reverse(bloco2)
-            insert!(seq, i - tam2 + tam1, v)
-        end
-    end
-
-    seq[end] = seq[1]
-
-    dist = p.data.distMatrix
-    s.cost = 0.0
-    for k in 1:length(seq)-1
-        s.cost += dist[seq[k], seq[k+1]]
+        insert!(seq, j:j-1, bloco_i)
+        novaPos_i = i - tam2 + tam1
+        insert!(seq, novaPos_i:novaPos_i-1, bloco_j)
     end
 
     return s
