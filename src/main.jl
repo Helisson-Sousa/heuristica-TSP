@@ -1,11 +1,5 @@
-# =========================================================
-# main.jl
-# Execução do ILS para o TSP usando Data do tspreader.jl
-# =========================================================
+# ========================= main.jl ================================
 
-# -----------------------------
-# Includes dos módulos
-# -----------------------------
 include(joinpath(@__DIR__, "tspreader.jl"))
 include(joinpath(@__DIR__, "Solution.jl"))
 include(joinpath(@__DIR__, "Construction.jl"))
