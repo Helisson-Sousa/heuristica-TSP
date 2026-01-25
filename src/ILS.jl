@@ -9,16 +9,25 @@ function ILS(dados::Data, maxIter::Int, maxIterILS::Int)
     pert   = Perturbation(dados)
 
     for it in 1:maxIter
+        println("===== ILS externo: iteração $it / $maxIter =====")
 
         s = solucaoInicial(constr)
 
         best = copy(s)
 
         iterILS = 0
+        a = 0
+        b = 0
 
         while iterILS <= maxIterILS
+            a = s.cost
+            b = best.cost
+
+            println("===== ILS interno: iteração $iterILS / $maxIterILS / $a / $b =====")
 
             RVND!(busca, s)
+
+            println(" Custo após RVND: $(s.cost)")
 
             if s.cost < best.cost
                 best = copy(s)

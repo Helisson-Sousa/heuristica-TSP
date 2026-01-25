@@ -248,6 +248,7 @@ function RVND!(ls::LocalSearch, s::Solution)
 
     while !isempty(movimentos)
         n = rand(1:length(movimentos))
+        
         improved = false
 
         if movimentos[n] == 1
@@ -261,7 +262,8 @@ function RVND!(ls::LocalSearch, s::Solution)
         elseif movimentos[n] == 5
             improved = bestImprovementOrOpt!(ls, s, 3)
         end
-
+        println(" Aplicando movimento $(movimentos[n]) / $n / $improved")
+        sleep(1.0)
         if improved
             movimentos = [1, 2, 3, 4, 5]
         else
