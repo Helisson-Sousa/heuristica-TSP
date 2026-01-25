@@ -194,47 +194,31 @@ end
 # 2-Opt (Best Improvement)
 
 function bestImprovement2Opt!(ls::LocalSearch, s::Solution)::Bool
-    best_i = -1
-    best_j = -1
-    bestCost = s.cost
-
     seq = s.sequence
-    n = length(seq)
+    n = length(seq) - 1  # DIMENSION (exclui o retorno ao depósito)
+
+    bestDelta = 0
+    best_i = 0
+    best_j = 0
 
     for i in 2:n-2
-        vi = seq[i]
-        vi_prev = seq[i-1]
+        for j in i+2:n
+            delta = -ls.data.distMatrix[seq[i-1], seq[i]] -
+                     ls.data.distMatrix[seq[j], seq[j+1]] +
+                     ls.data.distMatrix[seq[i-1], seq[j]] +
+                     ls.data.distMatrix[seq[i], seq[j+1]]
 
-        for j in i+2:n-1
-            vj = seq[j]
-            vj_next = seq[j+1]
-
-            custoRetirada =
-                ls.data.distMatrix[vi_prev, vi] +
-                ls.data.distMatrix[vj, vj_next]
-
-            custoInsercao =
-                ls.data.distMatrix[vi_prev, vj] +
-                ls.data.distMatrix[vi, vj_next]
-
-            for k in i:j-1
-                custoRetirada += ls.data.distMatrix[seq[k], seq[k+1]]
-                custoInsercao += ls.data.distMatrix[seq[k+1], seq[k]]
-            end
-
-            cost = s.cost - custoRetirada + custoInsercao
-
-            if cost < bestCost
-                bestCost = cost
+            if delta < bestDelta
+                bestDelta = delta
                 best_i = i
                 best_j = j
             end
         end
     end
 
-    if best_i != -1
-        reverse!(seq[best_i:best_j])
-        s.cost = bestCost
+    if bestDelta < 0
+        seq[best_i:best_j] = reverse(seq[best_i:best_j])
+        s.cost += bestDelta
         return true
     end
 
@@ -248,22 +232,21 @@ function RVND!(ls::LocalSearch, s::Solution)
 
     while !isempty(movimentos)
         n = rand(1:length(movimentos))
-        
+        mov = movimentos[n]
         improved = false
 
-        if movimentos[n] == 1
+        if mov == 1
             improved = bestImprovementSwap!(ls, s)
-        elseif movimentos[n] == 2
+        elseif mov == 2
             improved = bestImprovement2Opt!(ls, s)
-        elseif movimentos[n] == 3
+        elseif mov == 3
             improved = bestImprovementReInsertion!(ls, s)
-        elseif movimentos[n] == 4
+        elseif mov == 4
             improved = bestImprovementOrOpt!(ls, s, 2)
-        elseif movimentos[n] == 5
+        elseif mov == 5
             improved = bestImprovementOrOpt!(ls, s, 3)
         end
-        println(" Aplicando movimento $(movimentos[n]) / $n / $improved")
-        sleep(1.0)
+
         if improved
             movimentos = [1, 2, 3, 4, 5]
         else

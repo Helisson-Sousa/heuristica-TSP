@@ -1,7 +1,6 @@
 using Printf, LinearAlgebra
 using Base.Filesystem: basename, splitext
 
-const INFINITE = typemax(Int)
 
 # ---------------------- Estrutura Data ----------------------
 mutable struct Data
@@ -39,12 +38,12 @@ function CalcLatLong(X, Y, n)
     latitude = zeros(n)
     longitude = zeros(n)
     for i in 1:n
-        deg = floor(X[i])
+        deg = trunc(Int, X[i])
         min = X[i] - deg
-        latitude[i] = PI * (deg + 5*min/3)/180
-        deg = floor(Y[i])
+        latitude[i] = PI * (deg + 5.0 * min / 3.0) / 180.0
+        deg = trunc(Int, Y[i])
         min = Y[i] - deg
-        longitude[i] = PI * (deg + 5*min/3)/180
+        longitude[i] = PI * (deg + 5.0 * min / 3.0) / 180.0
     end
     return latitude, longitude
 end
@@ -54,7 +53,7 @@ function CalcDistGeo(latit, longit, I, J)
     q1 = cos(longit[I] - longit[J])
     q2 = cos(latit[I] - latit[J])
     q3 = cos(latit[I] + latit[J])
-    return floor(Int, RRR * acos(0.5*((1 + q1) * q2 - (1 - q1) * q3)) + 1)
+    return trunc(Int, RRR * acos(0.5 * ((1.0 + q1) * q2 - (1.0 - q1) * q3)) + 1.0)
 end
 
 
@@ -92,7 +91,7 @@ function read!(data::Data)
         if ewf == "FULL_MATRIX"
             for i in 1:data.dimension, j in 1:data.dimension
                 data.distMatrix[i,j] = matrix_values[idx]
-                if i == j data.distMatrix[i,j] = INFINITE end
+                if i == j data.distMatrix[i,j] = 0.0 end
                 idx += 1
             end
         else
@@ -127,7 +126,7 @@ function read!(data::Data)
 
         for i in 1:data.dimension, j in 1:data.dimension
             if i == j
-                data.distMatrix[i,j] = INFINITE
+                data.distMatrix[i,j] = 0.0
             else
                 if typeProblem == "EUC_2D"
                     data.distMatrix[i,j] = round(CalcDistEuc(data.xCoord, data.yCoord, i, j))
