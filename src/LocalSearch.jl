@@ -4,9 +4,8 @@ mutable struct LocalSearch
     data::Data
 end
 
-# ---------------------------------------------------
 # Swap (Best Improvement)
-# ---------------------------------------------------
+
 function bestImprovementSwap!(ls::LocalSearch, s::Solution)::Bool
     best_i = -1
     best_j = -1
@@ -68,9 +67,8 @@ function bestImprovementSwap!(ls::LocalSearch, s::Solution)::Bool
     return false
 end
 
-# ---------------------------------------------------
 # Reinsertion (Best Improvement)
-# ---------------------------------------------------
+
 function bestImprovementReInsertion!(ls::LocalSearch, s::Solution)::Bool
     best_i = -1
     best_j = -1
@@ -128,9 +126,8 @@ function bestImprovementReInsertion!(ls::LocalSearch, s::Solution)::Bool
     return false
 end
 
-# ---------------------------------------------------
 # Or-Opt (tamBloco = 2 ou 3)
-# ---------------------------------------------------
+
 function bestImprovementOrOpt!(ls::LocalSearch, s::Solution, tamBloco::Int)::Bool
     best_i1 = -1
     best_i2 = -1
@@ -194,9 +191,8 @@ function bestImprovementOrOpt!(ls::LocalSearch, s::Solution, tamBloco::Int)::Boo
     return false
 end
 
-# ---------------------------------------------------
 # 2-Opt (Best Improvement)
-# ---------------------------------------------------
+
 function bestImprovement2Opt!(ls::LocalSearch, s::Solution)::Bool
     best_i = -1
     best_j = -1
@@ -245,9 +241,8 @@ function bestImprovement2Opt!(ls::LocalSearch, s::Solution)::Bool
     return false
 end
 
-# ---------------------------------------------------
 # RVND
-# ---------------------------------------------------
+
 function RVND!(ls::LocalSearch, s::Solution)
     movimentos = [1, 2, 3, 4, 5]
 

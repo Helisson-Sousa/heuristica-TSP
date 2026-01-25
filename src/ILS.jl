@@ -2,8 +2,6 @@
 
 function ILS(dados::Data, maxIter::Int, maxIterILS::Int)
 
-    println(">> ILS iniciado")
-
     bestOfAll = Solution(Inf)
 
     constr = Construction(dados)
@@ -11,31 +9,25 @@ function ILS(dados::Data, maxIter::Int, maxIterILS::Int)
     pert   = Perturbation(dados)
 
     for it in 1:maxIter
-        solAtual = solucaoInicial(constr)
 
-        RVND!(busca, solAtual)
+        s = solucaoInicial(constr)
 
-        best = copy(solAtual)
+        best = copy(s)
+
         iterILS = 0
 
-        maxPerturb = 200
-        contPerturb = 0
+        while iterILS <= maxIterILS
 
-        while iterILS < maxIterILS && contPerturb < maxPerturb
-            contPerturb += 1
+            RVND!(busca, s)
 
-            solAtual = mecanismoPert!(pert, best)
-            println("        Perturbação aplicada")
-
-            RVND!(busca, solAtual)
-
-            if solAtual.cost < best.cost
-                println("        Melhora encontrada")
-                best = copy(solAtual)
+            if s.cost < best.cost
+                best = copy(s)
                 iterILS = 0
-            else
-                iterILS += 1
             end
+
+            s = mecanismoPert!(pert, best)
+
+            iterILS += 1
         end
 
         if best.cost < bestOfAll.cost
@@ -43,6 +35,5 @@ function ILS(dados::Data, maxIter::Int, maxIterILS::Int)
         end
     end
 
-    println(">> ILS terminou")
     return bestOfAll
 end

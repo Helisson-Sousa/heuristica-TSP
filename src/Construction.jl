@@ -1,22 +1,13 @@
-# =========================================================
-# Construction.jl
-# Heurística construtiva para o TSP (GRASP-like insertion)
-# =========================================================
+# =================== Construction.jl ===================
 
 using Random
 
-# ---------------------------------------------------------
-# Estrutura auxiliar para custo de inserção
-# ---------------------------------------------------------
 mutable struct InsertionInfo
     node::Int
     edgePos::Int
     cost::Float64
 end
 
-# ---------------------------------------------------------
-# Estrutura Construction
-# ---------------------------------------------------------
 mutable struct Construction
     data::Data
     remaining::Vector{Int}
@@ -27,23 +18,16 @@ mutable struct Construction
     end
 end
 
-# ---------------------------------------------------------
-# Solução inicial (in-place)
-# Equivalente ao Construcao::solucaoInicial(Solucao& s) em C++
-# ---------------------------------------------------------
 function solucaoInicial!(constr::Construction, s::Solution)
 
-    # Inicializa lista de cidades não visitadas (2 até n)
     constr.remaining = collect(2:constr.data.dimension)
     empty!(constr.insertionCost)
 
-    # Solução começa e termina na cidade 1
     s.sequence = [1, 1]
     s.cost = 0.0
 
     dist = constr.data.distMatrix
 
-    # ------------------ Inserção aleatória inicial (3 cidades) ------------------
     for _ in 1:3
         idx = rand(1:length(constr.remaining))
         city = constr.remaining[idx]
@@ -60,7 +44,6 @@ function solucaoInicial!(constr::Construction, s::Solution)
         deleteat!(constr.remaining, idx)
     end
 
-    # ------------------ Inserções guiadas por custo (GRASP) ------------------
     while !isempty(constr.remaining)
 
         calcularCustoInsercao!(constr, s)
@@ -78,19 +61,12 @@ function solucaoInicial!(constr::Construction, s::Solution)
     end
 end
 
-# ---------------------------------------------------------
-# Wrapper: cria e retorna uma Solution
-# Necessário para o ILS
-# ---------------------------------------------------------
 function solucaoInicial(constr::Construction)
     s = Solution()
     solucaoInicial!(constr, s)
     return s
 end
 
-# ---------------------------------------------------------
-# Cálculo dos custos de inserção
-# ---------------------------------------------------------
 function calcularCustoInsercao!(constr::Construction, s::Solution)
 
     empty!(constr.insertionCost)
@@ -112,9 +88,6 @@ function calcularCustoInsercao!(constr::Construction, s::Solution)
     end
 end
 
-# ---------------------------------------------------------
-# Inserção efetiva na solução
-# ---------------------------------------------------------
 function inserirNaSolucao!(constr::Construction, s::Solution, info::InsertionInfo)
 
     insert!(s.sequence, info.edgePos + 1, info.node)
