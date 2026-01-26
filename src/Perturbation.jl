@@ -11,15 +11,12 @@ function mecanismoPert!(p::Perturbation, best::Solution)::Solution
     n   = p.data.dimension
     dist = p.data.distMatrix
 
-    # Tamanhos dos blocos (igual ao C++)
     maxTam = div(n, 10)
     tam1 = 2 + rand(0:maxTam-1)
     tam2 = 2 + rand(0:maxTam-1)
 
-    # Escolha da posição i
     i = 2 + rand(0:(n - tam1 - 2))
 
-    # Escolha da posição j (sem sobreposição)
     j = 0
     while true
         j = 2 + rand(0:(n - tam2 - 2))
@@ -28,11 +25,9 @@ function mecanismoPert!(p::Perturbation, best::Solution)::Solution
         end
     end
 
-    # Blocos
     bloco_i = seq[i:(i + tam1 - 1)]
     bloco_j = seq[j:(j + tam2 - 1)]
 
-    # Vértices auxiliares
     vi        = seq[i]
     vi_prev   = seq[i - 1]
     vi2       = seq[i + tam1 - 1]
@@ -43,7 +38,6 @@ function mecanismoPert!(p::Perturbation, best::Solution)::Solution
     vj2       = seq[j + tam2 - 1]
     vj2_next  = seq[j + tam2]
 
-    # Cálculo de custo (idêntico ao C++)
     custoRetirada = 0.0
     custoInsercao = 0.0
 
@@ -85,7 +79,7 @@ function mecanismoPert!(p::Perturbation, best::Solution)::Solution
 
     s.cost = s.cost - custoRetirada + custoInsercao
 
-    # ================== REINSERÇÃO CORRETA ==================
+    # ================== REINSERÇÃO ==================
 
     if j > i
         deleteat!(seq, j:(j + tam2 - 1))

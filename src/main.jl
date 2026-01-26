@@ -12,7 +12,7 @@ using Random
 
 function main()
 
-    instancia_path = joinpath(@__DIR__, "../instances/ulysses22.tsp")
+    instancia_path = joinpath(@__DIR__, "../instances/ulysses16.tsp")
 
     data = Data(2, instancia_path)
     read!(data)

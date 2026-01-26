@@ -195,7 +195,7 @@ end
 
 function bestImprovement2Opt!(ls::LocalSearch, s::Solution)::Bool
     seq = s.sequence
-    n = length(seq) - 1  # DIMENSION (exclui o retorno ao depósito)
+    n = length(seq) - 1
 
     bestDelta = 0
     best_i = 0
